@@ -24,12 +24,10 @@ pipeline {
                 withDockerRegistry(credentialsId: 'docker-cred', toolName: 'Docker') 
                 {dir('/home/ubuntu/.jenkins/workspace/Virtual-Browser/.docker/google-chrome ') {
                     sh "docker build -t suresh10214/vb.latest"
-               }
-             
-                
-}  
-            }
-        }
+               }        
+           }  
+         }
+       }
        stage('Trivy Docker Scan') {
             steps {
                 script {
