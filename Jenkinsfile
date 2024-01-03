@@ -19,6 +19,8 @@ pipeline {
                  sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=VirtualBrowser \
                  -Dsonar projectName=VirtualBrower '''            
        }
+            }
+        }
        stage('Docker Build & Tag Image'){
             steps{
                 withDockerRegistry(credentialsId: 'docker-cred', toolName: 'Docker') 
