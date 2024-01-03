@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser'
+                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser.git'
             }
         }
         stage('Depanancy check'){
