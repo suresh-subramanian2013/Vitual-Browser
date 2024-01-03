@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser.git'
+                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser'
             }
         }
         stage('Dependency Check') {
@@ -51,7 +51,8 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'Docker') {
-                        sh "docker build -t suresh10214/vb:latest ."
+                        
+                            sh "docker build -t suresh10214/vb:latest ."
                         }
                     }
                 }
