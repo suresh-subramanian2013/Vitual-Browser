@@ -1,56 +1,63 @@
 pipeline {
-    agent any
+    agent any 
+
+    environment {
+        SCANNER_HOME = tool 'sonar-tool'
+    }
 
     stages {
-        stage('Git Checkout') {
+        stage ('git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser.git'
+                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser.git' 
             }
         }
-        stage('Depanancy check'){
+
+        stage ('Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-        stage('Sonar Scanner'){
+
+        stage ('Sonar Scanner') {
             steps {
-                withSonarQubeEnv('sonar') {
-                 sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=VirtualBrowser \
-                 -Dsonar projectName=VirtualBrower '''            
-              }
-            }
-        }
-       stage('Docker Build & Tag Image'){
-            steps {
-                withDockerRegistry(credentialsId: 'docker-cred', toolName: 'Docker') 
-                {dir('/root/.jenkins/workspace/Virtual-Browser/.docker/google-chrome ') {
-                    sh "docker build -t suresh10214/vb.latest"
-               }        
-           }  
-         }
-       }
-       stage('Trivy Docker Scan') {
-            steps {
-                script {
-                    sh "trivy image suresh10214/vb:latest > trivy.txt"
+                withSonarQubeEnv('sonar-server') {
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=VirtualBrowser -Dsonar.projectName=VirtualBrowser"
                 }
             }
         }
-       stage('Docker push') {
+
+        stage ("Docker Build and Tag") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'Docker') {
-                        
-                            sh "docker build -t suresh10214/vb:latest ."
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        dir('/root/.jenkins/workspace/VB/.docker/brave') {
+                            sh "docker build -t promo286/vb:latest ."
                         }
                     }
                 }
             }
         }
-                
-      }
-    
-            
-    
 
+        stage ("Image Scan") {
+            steps {
+                sh "trivy image suresh10214/vb:latest"
+            }
+        }
+
+        stage ("Image Push") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push suresh10214/vb:latest"
+                    }
+                }
+            }
+        }
+        stage ("Deploy"){
+            steps{
+                sh "docker-compose up -d "
+            }
+        }
+    }
+}
