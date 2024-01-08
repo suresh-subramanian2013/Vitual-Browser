@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        dir('/root/.jenkins/workspace/VB/.docker/brave') {
+                        dir('/root/.jenkins/workspace/VB/.docker/opera') {
                             sh "docker build -t suresh10214/vb:latest ."
                         }
                     }
