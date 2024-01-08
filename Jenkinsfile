@@ -1,44 +1,68 @@
 pipeline {
-    agent any 
+    agent any
 
-    environment {
+
+   environment {
         SCANNER_HOME = tool 'sonar-scanner'
+        WORKSPACE_DIR = '/home/ubuntu/jenkins-workspace/Vitual-Browser'
     }
 
-    stages {
-        stage ('git Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser.git' 
-            }
-        }
 
-        stage ('Dependency Check') {
+   stages {
+        stage('git Checkout') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-
-        stage ('Sonar Scanner') {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=VirtualBrowser -Dsonar.projectName=VirtualBrowser"
+               dir(WORKSPACE_DIR) {
+                    git branch: 'main', url: 'https://github.com/suresh-subramanian2013/Vitual-Browser.git'
                 }
             }
         }
 
-       stage ("Docker Build and Tag") {
+
+       stage('Check User') {
+            steps {
+                script {
+                    def currentUser = sh(script: 'whoami', returnStdout: true).trim()
+                    echo "Current user running the job: ${currentUser}"
+                }
+            }
+        }
+
+
+       stage('Dependency Check') {
+            steps {
+                script {
+                    dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
+
+
+       stage('Sonar Scanner') {
+            steps {
+                script {
+                    withSonarQubeEnv('sonar-server') {
+                        sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=VirtualBrowser -Dsonar.projectName=VirtualBrowser"
+                    }
+                }
+            }
+        }
+
+
+       stage('Docker Build and Tag') {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        dir('/root/.jenkins/workspace/VB/.docker/opera') {
+                        dir("${WORKSPACE_DIR}/.docker/opera")  {
                             sh "docker build -t suresh10214/vb:latest ."
                         }
                     }
                 }
             }
         }
-      stage ("Image Push") {
+
+
+       stage('Image Push') {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
@@ -47,10 +71,14 @@ pipeline {
                 }
             }
         }
-        stage ("Deploy"){
-            steps{
-                sh "docker-compose up -d "
+
+
+       stage('Deploy') {
+            steps {
+                script {
+                    sh "docker-compose up -d"
+                }
             }
         }
-   }
+    }
 }
