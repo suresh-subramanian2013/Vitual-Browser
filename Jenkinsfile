@@ -39,25 +39,5 @@ pipeline {
             }
         }
 
-        stage ("Image Scan") {
-            steps {
-                sh "trivy image suresh10214/vb:latest"
-            }
-        }
-
-        stage ("Image Push") {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push suresh10214/vb:latest"
-                    }
-                }
-            }
-        }
-        stage ("Deploy"){
-            steps{
-                sh "docker-compose up -d "
-            }
-        }
-    }
+   }
 }
