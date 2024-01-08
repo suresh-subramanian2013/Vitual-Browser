@@ -38,6 +38,19 @@ pipeline {
                 }
             }
         }
-
+      stage ("Image Push") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push suresh10214/vb:latest"
+                    }
+                }
+            }
+        }
+        stage ("Deploy"){
+            steps{
+                sh "docker-compose up -d "
+            }
+        }
    }
 }
