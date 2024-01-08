@@ -32,7 +32,7 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         dir('/root/.jenkins/workspace/VB/.docker/brave') {
-                            sh "docker build -t promo286/vb:latest ."
+                            sh "docker build -t suresh10214/vb:latest ."
                         }
                     }
                 }
