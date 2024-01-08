@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        stage ("Docker Build and Tag") {
+       stage ("Docker Build and Tag") {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
